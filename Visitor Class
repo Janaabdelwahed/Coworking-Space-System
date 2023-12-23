@@ -1,0 +1,206 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Visitor extends User {
+    Scanner scanner = new Scanner(System.in);
+    public int ID;
+    private String type;
+    public    ArrayList<Slot>reservations = new ArrayList<>();
+
+    public Visitor(String type, String name, String password, int ID) {
+        super(name, password);
+        this.ID = ID;
+        this.type = type;
+    }
+
+    public Visitor(String name, String pass) {
+        super(name, pass);
+    }
+
+    public Visitor() {
+        super();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public int login(String name, String enteredPassword) {
+        int visitor_index = -1;
+        boolean found = false;
+        for (int i = 0; i < WorkSpace.visitorList.size(); i++) {
+            if (WorkSpace.visitorList.get(i).getName().equalsIgnoreCase(name) && WorkSpace.visitorList.get(i).getPassword().equals(enteredPassword)) {
+                found = true;
+                visitor_index = i;
+            }
+        }
+        if (found == true) {
+            System.out.println("Login successfully");
+            return visitor_index;
+        } else {
+            System.out.println("there is no matching data .. " +"\n"+ "Register to use the system ");
+            return -1;
+        }
+    }
+
+
+    public static void register(List<Visitor> visitors) {
+        Visitor visitor = new Visitor();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("-----------------------------------------------------");
+        System.out.print("Enter your Username : ");
+        String Username = scanner.next();
+        System.out.println("Enter your password : ");
+        String password = scanner.next();
+        System.out.println("Enter your type : ");
+        String type = scanner.next();
+
+        while (true) {
+            if (type.equalsIgnoreCase("General") || type.equalsIgnoreCase("Formal") || type.equalsIgnoreCase("Instructor")) {
+                break;
+            } else {
+                System.out.println("invalid type .. your type should be (general , formal , instructor) .. ");
+                type = scanner.next();
+            }
+        }
+        System.out.println("Enter your ID : ");
+        int ID = scanner.nextInt();
+        for (Visitor v : WorkSpace.visitorList) {
+            if (v.ID == ID) {
+                System.out.println("This ID is not available .. try again");
+                ID = scanner.nextInt();
+            }
+        }
+        visitor = new Visitor(type, Username, password, ID);
+        visitors.add(visitor);
+        System.out.println("-----------------------------------------------------");
+        System.out.println("..Registered successfully .. Welcome to our workspace .. ");
+    }
+
+    public void makeReservation(){
+        System.out.println("-----------------------------------------------------");
+        Scanner scanner = new Scanner(System.in);
+        if(this.getType().equalsIgnoreCase("General")) {
+            WorkSpace.generalRooms.get(0).displayAvailableSlots();
+            WorkSpace.generalRooms.get(1).displayAvailableSlots();
+            System.out.println("Enter slot number:");
+            int slotNumber = scanner.nextInt();
+            for (GeneralRoom room : WorkSpace.generalRooms) {
+                for (Slot slot : room.slots) {
+                    if (slotNumber == slot.slotCount) {
+                        WorkSpace.visitorList.get(Main.x).reservations.add(slot);
+                        slot.availability = "unavailable";
+                    }
+                }
+            }
+            System.out.println("-----------------------------------------------------");
+        }
+        else if(this.getType().equalsIgnoreCase("formal")){
+            WorkSpace.meetingRooms.get(0).displayAvailableSlots();
+            WorkSpace.meetingRooms.get(1).displayAvailableSlots();
+            WorkSpace.meetingRooms.get(2).displayAvailableSlots();
+            int slotNumber = scanner.nextInt();
+            for (MeetingRoom room : WorkSpace.meetingRooms) {
+                for (Slot slot : room.slots) {
+                    if (slotNumber == slot.slotCount) {
+                        WorkSpace.visitorList.get(Main.x).reservations.add(slot);
+                        slot.availability ="unavailable";
+                    }
+                }
+            }
+            System.out.println("-----------------------------------------------------");
+        }
+        else if(this.getType().equalsIgnoreCase("Instructor")){
+            WorkSpace.teachingRooms.get(0).displayAvailableSlots();
+            WorkSpace.teachingRooms.get(1).displayAvailableSlots();
+            WorkSpace.teachingRooms.get(2).displayAvailableSlots();
+            System.out.println("Enter slot number:");
+            int slotNumber = scanner.nextInt();
+            for (TeachingRoom room : WorkSpace.teachingRooms) {
+                for (Slot slot : room.slots) {
+                    if (slotNumber == slot.slotCount) {
+                        WorkSpace.visitorList.get(Main.x).reservations.add(slot);
+                        slot.availability = "unavailable";
+
+                    }
+                }
+            }
+            System.out.println("-----------------------------------------------------");
+        }
+
+    }
+    public void updateReservation() {
+        System.out.println("-----------------------------------------------------");
+        int choice;
+        do {
+            System.out.println("Update reservations:");
+            System.out.println("1.Update Date : ");
+            System.out.println("2.Update Time : ");
+            System.out.println("3.Update RoomName : ");
+            System.out.println("0.Save updates : ");
+            System.out.println("Enter your choice:");
+            choice = scanner.nextInt();
+            System.out.println("-----------------------------------------------------");
+            int z;
+            switch (choice) {
+
+                case 1:
+                    displayReservationsData();
+                    System.out.println("Enter your choice you want to update");
+                    z = scanner.nextInt();
+                    System.out.println("Enter the date in this format (dd-MM-YYYY)");
+                    WorkSpace.visitorList.get(Main.x).reservations.get(z).date = scanner.next();
+                    break;
+                case 2:
+                    displayReservationsData();
+                    System.out.println("Enter your choice you want to update");
+                    z = scanner.nextInt();
+                    System.out.println("Enter the date in this format (HH:MM)");
+                    WorkSpace.visitorList.get(Main.x).reservations.get(z).time = scanner.next();
+
+                    break;
+                case 3:
+                    displayReservationsData();
+                    System.out.println("Enter your choice you want to update");
+                    z = scanner.nextInt();
+                    System.out.println("Enter the room name :");
+                    WorkSpace.visitorList.get(Main.x).reservations.get(z).roomName = scanner.next();
+                    break;
+                case 0:
+                    System.out.println("your updates has been saved successfully .");
+                    break;
+                default:
+                    System.out.println("Invalid choice .");
+                    break;
+            }
+        }while(choice!=0);
+
+        System.out.println("-----------------------------------------------------");
+    }
+    public void cancelReservation(){
+        displayReservationsData();
+        System.out.println("Enter your choice to delete the reservation:");
+        int choice = scanner.nextInt();
+        WorkSpace.visitorList.get(Main.x).reservations.get(choice).availability = "available";
+        WorkSpace.visitorList.get(Main.x).reservations.remove(choice);
+    }
+    public void displayReservationsData(){
+        System.out.println("Your Reservation is :");
+        for(int i = 0 ; i <WorkSpace.visitorList.get(Main.x).reservations.size();i++){
+            System.out.println(i);
+            System.out.println(WorkSpace.visitorList.get(Main.x).reservations.get(i).date+"\t"+WorkSpace.visitorList.get(Main.x).reservations.get(i).time+"\t"+
+                    WorkSpace.visitorList.get(Main.x).reservations.get(i).fees+"\t"+ WorkSpace.visitorList.get(Main.x).reservations.get(i).roomName);
+        }
+    }
+
+}
+
+
+
+
