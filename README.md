@@ -1,5 +1,5 @@
 # Coworking-Space-System
-a coworking space system with OOP in java
+A coworking space system with OOP in java
 
 
 Title : Coworking space System
